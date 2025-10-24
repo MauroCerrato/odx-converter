@@ -11,14 +11,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
     id("com.github.bjornvester.xjc") version libs.versions.xjc
-    application
-    id("com.gradleup.shadow") version libs.versions.shadow
+    /* id("com.gradleup.shadow") version libs.versions.shadow */
     id("com.google.protobuf") version libs.versions.protobuf
     kotlin("plugin.serialization") version libs.versions.kt.plugins.serialization
+	id("com.github.johnrengelman.shadow") version "8.1.1"
+	application
 }
+
 
 val odxSchema = file("$projectDir/src/main/resources/schema/odx_2_2_0.xsd")
 
@@ -55,9 +60,48 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+/* added to force Gradle to include the generated Java sources from the xjc in the Kotlin classpath */
+
+
+java {
+    sourceSets["main"].java.srcDirs(
+        // Be specific: point to the directory that contains the .java files
+        layout.buildDirectory.dir("generated/sources/xjc/java").get().asFile,
+        layout.buildDirectory.dir("generated/source/proto/main/java").get().asFile
+    )
+}
+
+
+
+
+
+
+
+
+protobuf {
+    generateProtoTasks {
+        all().forEach {
+            it.builtins {
+                maybeCreate("java")
+            }
+        }
+    }
+}
+
+
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
+
+
+
 tasks.test {
     useJUnitPlatform()
 }
+
 
 xjc {
     xsdDir.set(file("src/main/resources/schema"))
@@ -69,13 +113,36 @@ xjc {
     addCompilationDependencies.set(true)
 }
 
-tasks {
-    application {
+application {
         mainClass.set("ConverterKt")
-    }
 }
 
-tasks.shadowJar {
+
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveBaseName.set("converter-all")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    manifest {
+        attributes["Main-Class"] = "ConverterKt"
+    }
+    mergeServiceFiles()
     exclude("**/schema/NOTICE.txt")
     exclude("**/odx*.xsd*")
 }
+
+tasks.named("compileJava") { 
+        dependsOn("xjc") 
+}
+
+tasks.named("compileKotlin") {
+    dependsOn("xjc") 
+}
+
+tasks.named("build") {
+    dependsOn("shadowJar")
+}
+
+// Debug output to verify paths
+println(">>> XJC output: ${layout.buildDirectory.dir("generated/sources/xjc").get().asFile}")
+println(">>> Proto output: ${layout.buildDirectory.dir("generated/source/proto/main/java").get().asFile}")

@@ -15,6 +15,8 @@ import org.eclipse.opensovd.cda.mdd.*
 import org.eclipse.opensovd.cda.mdd.DiagCodedType.MinMaxLengthType.Termination
 import org.eclipse.opensovd.cda.mdd.Param.ParamType
 import schema.odx.*
+/*adding explicit import*/
+import org.eclipse.opensovd.cda.mdd.DiagComm.DiagClassType
 
 fun TRANSMODE.toProtoBufEnum(): DiagService.TransmissionMode =
     when (this) {
@@ -98,12 +100,14 @@ fun DATATYPE.toProtoBufDiagCodedTypeEnum(): DiagCodedType.DataType =
 
 fun DIAGCLASSTYPE.toProtoBufEnum(): DiagComm.DiagClassType =
     when (this) {
-        DIAGCLASSTYPE.STARTCOMM -> DiagComm.DiagClassType.START_COMM
-        DIAGCLASSTYPE.DYN_DEF_MESSAGE -> DiagComm.DiagClassType.DYN_DEF_MESSAGE
-        DIAGCLASSTYPE.STOPCOMM -> DiagComm.DiagClassType.STOP_COMM
-        DIAGCLASSTYPE.READ_DYN_DEF_MESSAGE -> DiagComm.DiagClassType.READ_DYN_DEF_MESSAGE
-        DIAGCLASSTYPE.VARIANTIDENTIFICATION -> DiagComm.DiagClassType.VARIANT_IDENTIFICATION
+        DIAGCLASSTYPE.STARTCOMM             -> DiagComm.DiagClassType.START_COMM
+        DIAGCLASSTYPE.DYN_DEF_MESSAGE       -> DiagComm.DiagClassType.DYN_DEF_MESSAGE
+        DIAGCLASSTYPE.STOPCOMM              -> DiagComm.DiagClassType.STOP_COMM
+/* DIAGCLASSTYPE.READ_DYN_DEF_MESSAGE       -> DiagComm.DiagClassType.READ_DYN_DEF_MESSAGE */
+/* DIAGCLASSTYPE.READ_DYN_DEF_MESSAGE       -> DiagClassType.READ_DYN_DEF_MESSAGE */
+		DIAGCLASSTYPE.VARIANTIDENTIFICATION -> DiagComm.DiagClassType.VARIANT_IDENTIFICATION
         DIAGCLASSTYPE.CLEAR_DYN_DEF_MESSAGE -> DiagComm.DiagClassType.CLEAR_DYN_DEF_MESSAGE
+		else                                -> DiagComm.DiagClassType.UNRECOGNIZED
     }
 
 fun PARAM.toParamTypeEnum(): ParamType =

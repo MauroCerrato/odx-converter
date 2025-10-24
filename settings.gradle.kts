@@ -15,7 +15,7 @@ dependencyResolutionManagement {
             version("kotlin", "2.1.21")
             version("kt-plugins-serialization", "2.1.21")
             version("protobuf", "0.9.4")
-            version("shadow", "9.0.0-rc1")
+            /* version("shadow", "9.0.0-rc1") */
             version("xjc", "1.8.2")
 
             library("kotlinx-serialization-json", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
